@@ -1,4 +1,4 @@
-from Seq0 import *
+from Seq_0 import *
 
 folder = "../Session-04/"
 format_ = ".txt"
