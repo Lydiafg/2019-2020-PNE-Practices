@@ -2,7 +2,11 @@ class Seq:
 
     def __init__(self, strbases):
         self.strbases = strbases
-        print("New sequence created!")
+        if strbases == "A" or "C" or "G" or "T":
+            print("New sequence created!")
+        else:
+            print("ERROR")
+
 
     def __str__(self):
         return self.strbases
