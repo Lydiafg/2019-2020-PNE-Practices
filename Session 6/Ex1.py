@@ -1,10 +1,11 @@
 class Seq:
 
     def __init__(self, strbases):
-        self.strbases = strbases
         if strbases == "A" or "C" or "G" or "T":
+
             print("New sequence created!")
         else:
+            self.strbases = strbases
             print("ERROR")
 
 
