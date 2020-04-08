@@ -4,6 +4,7 @@ class Seq:
         bases = ["A", "C", "G", "T"]
         for i in strbases:
             if i not in bases:
+                print("ERROR!")
                 self.strbases = "ERROR"
             else:
                 self.strbases = strbases
