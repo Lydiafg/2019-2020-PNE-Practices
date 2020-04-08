@@ -2,7 +2,7 @@ class Seq:
 
     def __init__(self, strbases):
         self.strbases = strbases
-        if strbases == "A" or "C" or "G" or "T":
+        if strbases == "A" and "C" and "G" and "T":
             print("New sequence created!")
         else:
             print("ERROR")
