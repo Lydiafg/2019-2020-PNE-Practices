@@ -1,14 +1,19 @@
 class Seq:
+    NULL = "NULL"
 
-    def __init__(self, strbases):
+    def __init__(self, strbases=NULL):
         bases = ["A", "C", "G", "T"]
-        for i in strbases:
-            if i not in bases:
-                print("ERROR!")
-                self.strbases = "ERROR"
-            else:
-                self.strbases = strbases
-        print("New sequence created!")
+        if strbases == self.NULL:
+            self.strbases = self.NULL
+            print("NULL seq created")
+        else:
+            for i in strbases:
+                if i not in bases:
+                    print("ERROR!")
+                    self.strbases = "ERROR"
+                else:
+                    self.strbases = strbases
+            print("New sequence created!")
         return
 
     def __str__(self):
