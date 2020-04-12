@@ -5,7 +5,7 @@ format_ = ".txt"
 filename = "U5"
 
 
-print("-----| Practice 1, Exercise 3 |------")
+print("-----| Practice 1, Exercise 9 |------")
 print()
 
 s1 = Seq()
