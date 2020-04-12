@@ -1,6 +1,6 @@
-from Seq_0 import*
+from Seq_0 import *
 
-folder = "../Session-04/"
+folder = "../Session4/"
 format_ = ".txt"
 genes = ["U5", "ADA", "FRAT1", "FXN", "U5"]
 bases = ['A', 'C', 'T', 'G']
@@ -13,4 +13,4 @@ for gene in genes:
     print()
     print(f"Gene {gene}:")
     for base in bases:
-        print(f"  {base}: {seq_count_base(sequence)}")
+        print(f"  {base}: {seq_count_base(gene, sequence)}")
