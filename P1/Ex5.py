@@ -4,7 +4,7 @@ s1 = Seq()
 s2 = Seq("ACTGA")
 s3 = Seq("Invalid sequence")
 
-print("-----| Practice 1, Exercise 3 |------")
+print("-----| Practice 1, Exercise 5 |------")
 print()
 
 print(f"Sequence 1: (Length: {s1.len()})", f"{s1}")
