@@ -26,3 +26,16 @@ class Seq:
             return "0"
         else:
             return len(self.strbases)
+
+    def count_base(self, seq):
+        counter = 0
+        if self.strbases == self.NULL:
+            for base in seq:
+                counter = 0
+        elif self.strbases == "ERROR":
+            for base in seq:
+                counter = 0
+        else:
+            for base in seq:
+                counter = counter + 1
+        return counter
