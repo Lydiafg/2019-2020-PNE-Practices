@@ -1,6 +1,6 @@
 from Seq_0 import *
 
-folder = "../Session-04/"
+folder = "../Session4/"
 format_ = ".txt"
 genes = ["U5", "ADA", "FRAT1", "FXN", "U5"]
 bases = ['A', 'C', 'T', 'G']
