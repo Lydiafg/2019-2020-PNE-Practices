@@ -1,3 +1,4 @@
+from pathlib import Path
 class Seq:
     NULL = "NULL"
 
@@ -39,3 +40,34 @@ class Seq:
             for base in seq:
                 counter = counter + 1
         return counter
+
+    def count(self):
+        for base in ['A', 'C', 'T', 'G']:
+            dictionary = {f" A : {self.count_base('A')}", f" C : {self.count_base('C')}", f" G : {self.count_base('G')}", f" T : {self.count_base('T')}"}
+        return dictionary
+
+    def reverse(self):
+        if self.strbases == self.NULL:
+            return self.strbases
+        elif self.strbases == "ERROR":
+            return self.strbases
+        else:
+            return self.strbases[::-1]
+
+    def complement(self):
+        comp_bases = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+        new_seq = ""
+        if self.strbases == self.NULL:
+            return self.strbases
+        elif self.strbases == "ERROR":
+            return self.strbases
+        else:
+            for base in self.strbases:
+                new_seq += comp_bases[base]
+            return new_seq
+
+    def read_fasta(self, filename):
+        contents = Path(filename).read_text()
+        body = contents.split("\n")[1:]
+        self.strbases = "".join(body)
+        return self
