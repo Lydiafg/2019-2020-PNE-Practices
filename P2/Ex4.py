@@ -1,7 +1,7 @@
 from Client0 import Client
 
 PRACTICE = 2
-EXERCISE = 3
+EXERCISE = 4
 
 print(f"-----| Practice {PRACTICE}, Exercise {EXERCISE} |------")
 
