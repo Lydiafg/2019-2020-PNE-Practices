@@ -6,7 +6,7 @@ EXERCISE = 4
 print(f"-----| Practice {PRACTICE}, Exercise {EXERCISE} |------")
 
 IP = "192.168.1.52"  # tiene que ser el de mi ordenador
-PORT = 8080  # es el mismo pq depende de la apliación
+PORT = 8080  # tiene que ser el mismo que pongamos en el server (identificador del server)
 
 c = Client(IP, PORT)
 print(c)
