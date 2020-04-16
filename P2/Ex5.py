@@ -1,4 +1,5 @@
 from Client0 import Client
+from Seq1 import Seq
 
 PRACTICE = 2
 EXERCISE = 5
@@ -11,7 +12,7 @@ folder = "../Session4/"
 filename = "U5"
 format_ = ".txt"
 
-complete_file = folder + filename + format_
+complete_file = Seq().read_fasta(folder + filename + format_)
 
 c = Client(IP, PORT)
 print(c)
