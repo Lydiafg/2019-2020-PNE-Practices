@@ -23,7 +23,7 @@ c.talk(complete_file)
 
 length = 10
 
-for i in range(5):
-    fragment = complete_file[i*length:(i+1)*length]
+for i in range(5):  # porque queremos 5 fragmentos
+    fragment = complete_file[i*length:(i+1)*length]  # del complete_file queremos que coja desde la primera letra (i) hasta 10
     print(f"Fragment {i+1} : {fragment}")
     c.talk(f"Fragment {i+1} : {fragment}")
