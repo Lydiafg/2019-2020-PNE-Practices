@@ -30,8 +30,9 @@ odd_numbers = [1, 3, 5, 7, 9]
 
 for i in range(10):
     fragment = complete_file[i*length:(i+1)*length]
-    print(f"Fragment {i+1} : {fragment}")
-    if i+1 == odd_numbers:
-        c1.talk(f"Fragment {i+1} : {fragment}")
+    real_index = i+1
+    print(f"Fragment {real_index} : {fragment}")
+    if real_index in odd_numbers:
+        c1.talk(f"Fragment {real_index} : {fragment}")
     else:
-        c2.talk(f"Fragment {i + 1} : {fragment}")
+        c2.talk(f"Fragment {real_index} : {fragment}")
