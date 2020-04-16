@@ -7,6 +7,7 @@ PORT = 8080
 IP = "192.168.1.52"  # tiene que ser el de mi ordenador
 MAX_OPEN_REQUESTS = 50
 
+
 # Counting the number of connections
 number_con = 0
 
