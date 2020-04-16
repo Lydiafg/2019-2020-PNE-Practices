@@ -5,8 +5,8 @@ EXERCISE = 3
 
 print(f"-----| Practice {PRACTICE}, Exercise {EXERCISE} |------")
 
-IP = "192.168.1.45"
-PORT = 8080
+IP = "192.168.1.52"  # tiene que ser el de mi ordenador
+PORT = 8080  # es el mismo pq depende de la apliación
 
 c = Client(IP, PORT)
 print(c)
