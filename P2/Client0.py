@@ -26,7 +26,6 @@ class Client:
         from_server = self.talk(to_server)
         print("To server: ", end="")
         termcolor.cprint(to_server, "blue")
-        print()
         print("From server: ", end="")
         termcolor.cprint(from_server, "yellow")
         return from_server
