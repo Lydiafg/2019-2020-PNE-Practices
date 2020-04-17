@@ -2,12 +2,7 @@ from Seq1 import Seq
 import socket
 import termcolor
 
-seq0 = "ACCGTGC"
-seq1 = "TCGGAC"
-seq2 = "GCATTGCA"
-seq3 = "CAGGTCA"
-seq4 = "CATTGTCGAGTGTGGCA"
-seq_list = [seq0, seq1, seq2, seq3, seq4]
+seq_list = ["ACCGTGC", "TCGGAC", "GCATTGCA", "CAGGTCA", "CATTGTCGAGTGTGGCA"]
 
 
 def get_command(num):
