@@ -19,6 +19,15 @@ ls.listen()
 
 print("The server is configured!")
 
+seq0 = "ACCGTGC"
+seq1 = "TCGGAC"
+seq2 = "GCATTGCA"
+seq3 = "CAGGTCA"
+seq4 = "CATTGTCGAGTGTGGCA"
+seq_list = [seq0, seq1, seq2, seq3, seq4]
+get_strings = ["GET 0", "GET 1", "GET 2", "GET 3", "GET 4"]
+
+
 while True:
     # -- Waits for a client to connect
     print("Waiting for Clients to connect")
@@ -53,6 +62,35 @@ while True:
             response = "OK!"
             cs.send(response.encode())
             cs.close()
+
+        elif msg in get_strings:
+            print("GET")
+            if msg == "GET 0":
+                response = seq_list[0]
+                print(response)
+                cs.send(response.encode())
+                cs.close()
+            elif msg == "GET 1":
+                response = seq_list[1]
+                print(response)
+                cs.send(response.encode())
+                cs.close()
+            elif msg == "GET 2":
+                response = seq_list[2]
+                print(response)
+                cs.send(response.encode())
+                cs.close()
+            elif msg == "GET 3":
+                response = seq_list[3]
+                print(response)
+                cs.send(response.encode())
+                cs.close()
+            elif msg == "GET 4":
+                response = seq_list[4]
+                print(response)
+                cs.send(response.encode())
+                cs.close()
+
         else:
             # -- Print the received message
             print(f"Message received: {msg}")
