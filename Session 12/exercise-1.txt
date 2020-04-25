@@ -1,0 +1,15 @@
+URL : http://127.0.0.1:8080/hello
+Request line : GET /hello HTTP/1.1
+Path : hello
+
+URL : http://127.0.0.1:8080/file.html
+Request line : GET /file.html HTTP/1.1
+Path : file.html
+
+URL : http://127.0.0.1:8080/hi/there?name=virus&type=corona
+Request line : GET /hi/there?name=virus&type=corona HTTP/1.1
+Path : hi/there?name=virus&type=corona
+
+The URL must be : http://127.0.0.1:8080/dna/u5
+Request line : GET /dna/u5 HTTP/1.1
+Path : dna/u5
