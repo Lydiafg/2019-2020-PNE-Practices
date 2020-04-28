@@ -30,13 +30,13 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         verb = arguments[0]
 
         if path == "":
-            contents = Path("form-3.html").read_text()
+            contents = Path("form-4.html").read_text()
             status = 200
-        elif path == "/form-3.html":
-            contents = Path("form-3.html").read_text()
+        elif path == "/form-4.html":
+            contents = Path("form-4.html").read_text()
             status = 200
         elif verb == "/":
-            contents = Path('form-3.html').read_text()
+            contents = Path('form-4.html').read_text()
             status = 200
         elif verb == "/ping":
 
@@ -50,7 +50,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         <body>
                         <h1>PING OK!</h1>
                         <h2>The Seq-2 Server is running...</h2>
-                        <a href="form-3.html">Main page</a>
+                        <a href="form-4.html">Main page</a>
                         """
             status = 200
         elif verb == "/get":
@@ -69,7 +69,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         <body>
                         <h2>Sequence number {num}</h2>
                         <p> {sequence} </p>
-                        <a href="form-3.html">Main page</a>
+                        <a href="form-4.html">Main page</a>
                         </body>
                         </html>
                         """
@@ -92,10 +92,85 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                             <textarea readonly rows="20" cols="80"> {read_seq} </textarea>
                             <br>
                             <br>
-                            <a href="form-3.html">Main page</a>
+                            <a href="form-4.html">Main page</a>
                             </body>
                             </html>
                             """
+            status = 200
+        elif verb == "/operation":
+            pair = arguments[1]
+            pairs = pair.split('&')
+            msg, sequence = pairs[0].split('=')
+            operation, name_ = pairs[1].split('=')
+            name = str(name_)
+            seq = Seq(sequence)
+            if name == "Info":
+                contents = f"""
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="utf-8">
+                                    <title>INFO SEQUENCE</title>
+                                </head>
+                                <body>
+                                <h1>Sequence</h1>
+                                <p> {sequence}</p>
+                                <h1>Operation:</h1>
+                                <p>{name}</p>
+                                <h1>Result:</h1>
+                                <p>Total length: {seq.len()}</p>
+                                <p>A:{seq.count_base("A")}</p>
+                                <p>C:{seq.count_base("C")}</p>
+                                <p>G:{seq.count_base("G")}</p>
+                                <p>T:{seq.count_base("T")}</p>
+                                <br>
+                                <br>
+                                <a href="form-4.html">Main page</a>
+                                </body>
+                                </html>
+                                """
+            elif name == "Comp":
+                contents = f"""
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="utf-8">
+                                    <title>INFO SEQUENCE</title>
+                                </head>
+                                <body>
+                                <h1>Sequence</h1>
+                                <h2> {sequence}</h2>
+                                <h1>Operation:</h1>
+                                <h2>{name}</h2>
+                                <h1>Result:</h1>
+                                <h2>{seq.complement()}</h2>
+                                <br>
+                                <br>
+                                <a href="form-4.html">Main page</a>
+                                </body>
+                                </html>
+                                """
+            elif name == "Rev":
+                contents = f"""
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="utf-8">
+                                    <title>INFO SEQUENCE</title>
+                                </head>
+                                <body>
+                                <h1>Sequence</h1>
+                                <h2> {sequence}</h2>
+                                <h1>Operation:</h1>
+                                <h2>{name}</h2>
+                                <h1>Result:</h1>
+                                <h2>{seq.reverse()}</h2>
+                                <br>
+                                <br>
+                                <a href="form-4.html">Main page</a>
+                                </body>
+                                </html>
+                                """
             status = 200
         else:
             contents = Path("Error.html").read_text()
