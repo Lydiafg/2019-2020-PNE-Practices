@@ -103,7 +103,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             msg, sequence = pairs[0].split('=')
             operation, name_ = pairs[1].split('=')
             name = str(name_)
-            seq = Seq(sequence)
+            seq_ = str(sequence)
+            seq = Seq(seq_)
             if name == "Info":
                 contents = f"""
                                 <!DOCTYPE html>
@@ -139,11 +140,11 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                 </head>
                                 <body>
                                 <h1>Sequence</h1>
-                                <h2> {sequence}</h2>
+                                <p> {sequence}</p>
                                 <h1>Operation:</h1>
-                                <h2>{name}</h2>
+                                <p>{name}</p>
                                 <h1>Result:</h1>
-                                <h2>{seq.complement()}</h2>
+                                <p>{seq.complement()}</p>
                                 <br>
                                 <br>
                                 <a href="form-4.html">Main page</a>
@@ -160,11 +161,11 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                 </head>
                                 <body>
                                 <h1>Sequence</h1>
-                                <h2> {sequence}</h2>
+                                <p> {sequence}</p>
                                 <h1>Operation:</h1>
-                                <h2>{name}</h2>
+                                <p>{name}</p>
                                 <h1>Result:</h1>
-                                <h2>{seq.reverse()}</h2>
+                                <p>{seq.reverse()}</p>
                                 <br>
                                 <br>
                                 <a href="form-4.html">Main page</a>
