@@ -11,6 +11,9 @@ socketserver.TCPServer.allow_reuse_address = True
 
 get_seq = ["ACCGT", "TACCG", "CGGTA", "GCCTA", "AAAGC"]
 
+folder = "../Session4/"
+format_ = ".txt"
+
 class TestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -26,15 +29,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         arguments = path.split('?')
         verb = arguments[0]
 
-
         if path == "":
-            contents = Path("form-2.html").read_text()
+            contents = Path("form-3.html").read_text()
             status = 200
-        elif path == "/form-2.html":
-            contents = Path("form-2.html").read_text()
+        elif path == "/form-3.html":
+            contents = Path("form-3.html").read_text()
             status = 200
         elif verb == "/":
-            contents = Path('form-2.html').read_text()
+            contents = Path('form-3.html').read_text()
             status = 200
         elif verb == "/ping":
 
@@ -48,7 +50,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         <body>
                         <h1>PING OK!</h1>
                         <h2>The Seq-2 Server is running...</h2>
-                        <a href="form-2.html">Main page</a>
+                        <a href="form-3.html">Main page</a>
                         """
             status = 200
         elif verb == "/get":
@@ -67,10 +69,33 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         <body>
                         <h2>Sequence number {num}</h2>
                         <p> {sequence} </p>
-                        <a href="form-2.html">Main page</a>
+                        <a href="form-3.html">Main page</a>
                         </body>
                         </html>
                         """
+            status = 200
+        elif verb == "/gene":
+            pair = arguments[1]
+            pairs = pair.split('&')
+            name, gene = pairs[0].split('=')
+            seq = Seq()
+            read_seq = seq.read_fasta(folder + gene + format_)
+            contents = f"""
+                            <!DOCTYPE html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>GET SEQUENCE</title>
+                            </head>
+                            <body>
+                            <h2>Gene {gene}</h2>
+                            <textarea readonly rows="20" cols="80"> {read_seq} </textarea>
+                            <br>
+                            <br>
+                            <a href="form-3.html">Main page</a>
+                            </body>
+                            </html>
+                            """
             status = 200
         else:
             contents = Path("Error.html").read_text()
