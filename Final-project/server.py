@@ -1,8 +1,14 @@
 import http.server
+import http.client
 import socketserver
+import json
+from Seq1 import Seq
 import termcolor
 from pathlib import Path
 
+SERVER = 'rest.ensembl.org'
+ENDPOINT = ["/info/species", "/info/assembly/"]
+PARAMETERS = "?content-type=application/json"
 
 PORT = 8080
 
@@ -20,8 +26,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         contents = ""
         status = 0
 
-
-
         arguments = path.split('?')
         verb = arguments[0]
 
@@ -35,22 +39,129 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = Path('main.html').read_text()
             status = 200
         elif verb == "/list_limit":
+
+            REQ_LINE = ENDPOINT[0] + PARAMETERS
+            conn = http.client.HTTPConnection(SERVER)
+
             pair = arguments[1]
-            name, value = pair.split("=")
-            value = int(value)
-            contents = """
+            msg, value = pair.split("=")
+
+            if value != "":
+                value = int(value)
+                try:
+                    conn.request("GET", REQ_LINE)
+                except ConnectionRefusedError:
+                    print("ERROR! Cannot connect to the Server")
+                    exit()
+
+                r1 = conn.getresponse()
+                print(f"Response received!: {r1.status} {r1.reason}\n")
+                data1 = r1.read().decode()
+                total_info = json.loads(data1)
+
+                species_info = total_info['species']
+
+                contents = f"""
+                            <!DOCTYPE html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>RESULT LIST</title>
+                            </head>
+                            <body style="background-color: lightblue;">
+                                <p>The total number of species in the ensembl is: {len(species_info)}</p>
+                                <p>The limit you have selected is: {value}</p>
+                                <p>The name of the species are: </p>
+                                <ol>  
+                            """
+
+                species_list = ""
+                for i in range(len(species_info [: int(value)])):
+                    species_list = species_list + "<li>"
+                    species_list = species_list + species_info[i]['common_name']
+                    species_list = species_list + "</li>"
+                species_list = species_list + "</ol></body></html>"
+                contents += f"<p>{species_list}</p>"
+                contents += "</body></html>"
+
+                status = 200
+            elif value == "":
+                try:
+                    conn.request("GET", REQ_LINE)
+                except ConnectionRefusedError:
+                    print("ERROR! Cannot connect to the Server")
+                    exit()
+
+                r1 = conn.getresponse()
+                print(f"Response received!: {r1.status} {r1.reason}\n")
+                data1 = r1.read().decode()
+                total_info = json.loads(data1)
+
+                species_info = total_info['species']
+
+                contents = f"""
+                            <!DOCTYPE html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>RESULT LIST</title>
+                            </head>
+                            <body style="background-color: lightblue;">
+                                <p>The total number of species in the ensembl is: {len(species_info)}</p>
+                                <p>The limit you have selected is: {value}</p>
+                                <p>The name of the species are: </p>
+                                <ol>  
+                            """
+
+                species_list = ""
+                for i in range(len(species_info)):
+                    species_list = species_list + "<li>"
+                    species_list = species_list + species_info[i]['common_name']
+                    species_list = species_list + "</li>"
+                species_list = species_list + "</ol></body></html>"
+                contents += f"<p>{species_list}</p>"
+                contents += "</body></html>"
+
+                status = 200
+        elif verb == "/species":
+            pair = arguments[1]
+            msg, species = pair.split("=")
+            REQ_LINE = ENDPOINT[1] + species + PARAMETERS
+            conn = http.client.HTTPConnection(SERVER)
+
+            try:
+                conn.request("GET", REQ_LINE)
+            except ConnectionRefusedError:
+                print("ERROR! Cannot connect to the Server")
+                exit()
+
+            r1 = conn.getresponse()
+            print(f"Response received!: {r1.status} {r1.reason}\n")
+            data1 = r1.read().decode()
+            total_info = json.loads(data1)
+
+            species_karyotype = total_info['karyotype']
+
+            contents = f"""
                         <!DOCTYPE html>
                         <html lang="en">
                         <head>
                             <meta charset="utf-8">
-                            <title>RESULT LIST</title>
+                            <title>RESULT KARYOTYPE</title>
                         </head>
-                        <body>
-                        <p>The total number os species in the ensembl is:</p>
+                        <body style="background-color: lightblue;">
+                            <p>The names of the chromosomes are:</p>
+                            <ol>  
                         """
-            contents += f"<p>The limit you have selected is: {value}</p>"
-            contents += f"<p>The name of the species are: </p>"
+
+            species_list = ""
+            for i in range(len(species_karyotype)):
+                species_list = species_list + "<br>"
+                species_list = species_list + species_karyotype[i]
+            species_list = species_list + "</ol></body></html>"
+            contents += f"<p>{species_list}</p>"
             contents += "</body></html>"
+
             status = 200
         else:
             contents = Path("Error.html").read_text()
