@@ -57,7 +57,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             pair = arguments[1]
             msg, limit = pair.split("=")
-            limit = int(limit)
+
             try:
                 conn.request("GET", REQ_LINE)
             except ConnectionRefusedError:  # this is for if the client cannot connect to the server (ensembl)
@@ -73,35 +73,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             species_info = total_info['species']
 
             # different situations of the limit
-            # if we write a limit in the list
-            if limit != "":
-                contents = f"""
-                            <!DOCTYPE html>
-                            <html lang="en">
-                            <head>
-                                <meta charset="utf-8">
-                                <title>RESULT LIST</title>
-                            </head>
-                            <body style="background-color: lightblue;">
-                                <p>The total number of species in the ensembl is: {len(species_info)}</p>
-                                <p>The limit you have selected is: {limit}</p>
-                                <p>The name of the species are: </p>
-                                <ol>  
-                            """
-                # the for loop to create the list of species till the limit we have put and include it in the html
-                species_list = ""
-                for i in range(len(species_info [: int(limit)])):
-                    species_list = species_list + "<li>"
-                    species_list = species_list + species_info[i]['common_name']
-                    species_list = species_list + "</li>"
-                species_list = species_list + "</ol></body></html>"
-                contents += f"<p>{species_list}</p>"
-                contents += "</body></html>"
-
-                status = 200
-
             # if we don´t write a limit
-            elif limit == "":
+            if limit == "":
                 contents = f"""
                             <!DOCTYPE html>
                             <html lang="en">
@@ -127,48 +100,60 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 contents += "</body></html>"
 
                 status = 200
+            else:
+                limit = int(limit)
 
-            # if we write one out of range
-            elif limit > len(species_info):
-                contents = Path("Error.html").read_text()
-                status = 404
+                # if we write a limit in the range of the list
+                if limit <= len(species_info):
+                    contents = f"""
+                                            <!DOCTYPE html>
+                                            <html lang="en">
+                                            <head>
+                                                <meta charset="utf-8">
+                                                <title>RESULT LIST</title>
+                                            </head>
+                                            <body style="background-color: lightblue;">
+                                                <p>The total number of species in the ensembl is: {len(species_info)}</p>
+                                                <p>The limit you have selected is: {limit}</p>
+                                                <p>The name of the species are: </p>
+                                                <ol>  
+                                            """
+                    # the for loop to create the list of species till the limit we have put and include it in the html
+                    species_list = ""
+                    for i in range(len(species_info[: int(limit)])):
+                        species_list = species_list + "<li>"
+                        species_list = species_list + species_info[i]['common_name']
+                        species_list = species_list + "</li>"
+                    species_list = species_list + "</ol></body></html>"
+                    contents += f"<p>{species_list}</p>"
+                    contents += "</body></html>"
+
+                    status = 200
+
+                # if we write one out of range
+                elif limit > len(species_info):
+                    contents = Path("Error.html").read_text()
+                    status = 404
 
         # this option is called when the client wants to know the karyotype of a specie in ensembl
         elif verb == "/karyotype":
             pair = arguments[1]
             msg, specie = pair.split("=")
 
-            # we firstly connect to the previous API rest method to know if the specie is in the list of the ones in
-            # ensembl
-            REQ_LINE_1 = ENDPOINT[0] + PARAMETERS
-            conn = http.client.HTTPConnection(SERVER)
+            # first if we don´t write anything in the specie space we will return the Error.html file
+            if specie== "":
+                contents = Path("Error.html").read_text()
+                status = 400
 
-            try:
-                conn.request("GET", REQ_LINE_1)
-            except ConnectionRefusedError:
-                print("ERROR! Cannot connect to the Server")
-                exit()
-
-            r1 = conn.getresponse()
-            print(f"Response received!: {r1.status} {r1.reason}\n")
-            data1 = r1.read().decode()
-            total_info = json.loads(data1)
-
-            species_info = total_info['species']
-
-            # we generate again the list of species and make options
-            species_list = ""
-            for i in range(len(species_info)):
-                species_list = species_list + "<li>"
-                species_list = species_list + species_info[i]['common_name']
-
-            # if is in the list then we connect to the second API rest endpoint to have the karyotype (by the same way)
-            if specie in species_list:
-                REQ_LINE_2 = ENDPOINT[1] + specie + PARAMETERS
+            # if we write something then we continue
+            elif specie != "":
+                # we firstly connect to the previous API rest method to know if the specie is in the list of the ones in
+                # ensembl
+                REQ_LINE_1 = ENDPOINT[0] + PARAMETERS
                 conn = http.client.HTTPConnection(SERVER)
 
                 try:
-                    conn.request("GET", REQ_LINE_2)
+                    conn.request("GET", REQ_LINE_1)
                 except ConnectionRefusedError:
                     print("ERROR! Cannot connect to the Server")
                     exit()
@@ -178,34 +163,58 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 data1 = r1.read().decode()
                 total_info = json.loads(data1)
 
-                species_karyotype = total_info['karyotype']
+                species_info = total_info['species']
 
-                contents = f"""
-                            <!DOCTYPE html>
-                            <html lang="en">
-                            <head>
-                                <meta charset="utf-8">
-                                <title>RESULT KARYOTYPE</title>
-                            </head>
-                            <body style="background-color: lightblue;">
-                                <p>The names of the chromosomes are:</p>
-                                <ol>  
-                            """
-                # we make a list of all the names (or numbers) of the chromosomes in the karyotype
-                chromosomes_list = ""
-                for i in range(len(species_karyotype)):
-                    chromosomes_list = chromosomes_list + "<br>"
-                    chromosomes_list = chromosomes_list + species_karyotype[i]
-                chromosomes_list = chromosomes_list + "</ol></body></html>"
-                contents += f"<p>{chromosomes_list}</p>"
-                contents += "</body></html>"
+                # we generate again the list of species and make options
+                species_list = ""
+                for i in range(len(species_info)):
+                    species_list = species_list + "<li>"
+                    species_list = species_list + species_info[i]['common_name']
 
-                status = 200
+                # if is in the list then we connect to the second API rest endpoint to have the karyotype (by the same way)
+                if specie in species_list:
+                    REQ_LINE_2 = ENDPOINT[1] + specie + PARAMETERS
+                    conn = http.client.HTTPConnection(SERVER)
 
-            # if the specie is not in the list of species of ensembl we return the Error.html file
-            elif specie not in species_list:
-                contents = Path("Error.html").read_text()
-                status = 400
+                    try:
+                        conn.request("GET", REQ_LINE_2)
+                    except ConnectionRefusedError:
+                        print("ERROR! Cannot connect to the Server")
+                        exit()
+
+                    r1 = conn.getresponse()
+                    print(f"Response received!: {r1.status} {r1.reason}\n")
+                    data1 = r1.read().decode()
+                    total_info = json.loads(data1)
+
+                    species_karyotype = total_info['karyotype']
+
+                    contents = f"""
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="utf-8">
+                                    <title>RESULT KARYOTYPE</title>
+                                </head>
+                                <body style="background-color: lightblue;">
+                                    <p>The names of the chromosomes are:</p>
+                                    <ol>  
+                                """
+                    # we make a list of all the names (or numbers) of the chromosomes in the karyotype
+                    chromosomes_list = ""
+                    for i in range(len(species_karyotype)):
+                        chromosomes_list = chromosomes_list + "<br>"
+                        chromosomes_list = chromosomes_list + species_karyotype[i]
+                    chromosomes_list = chromosomes_list + "</ol></body></html>"
+                    contents += f"<p>{chromosomes_list}</p>"
+                    contents += "</body></html>"
+
+                    status = 200
+
+                # if the specie is not in the list of species of ensembl we return the Error.html file
+                elif specie not in species_list:
+                    contents = Path("Error.html").read_text()
+                    status = 400
 
         # this option is called when the client wants to know the length of a chromosome of a specie in ensembl
         elif verb == "/chromosomeLength":
@@ -236,18 +245,16 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             species_list = ""
             for i in range(len(species_info)):
-                species_list = species_list + "<li>"
                 species_list = species_list + species_info[i]['common_name']
 
             # if the specie is in the list we connect to the corresponding API rest endpoint to know the length
             if specie in species_list:
                 length = None
-
-                REQ_LINE = ENDPOINT[1] + specie + PARAMETERS
+                REQ_LINE_2 = ENDPOINT[1] + specie + PARAMETERS
                 conn = http.client.HTTPConnection(SERVER)
 
                 try:
-                    conn.request("GET", REQ_LINE)
+                    conn.request("GET", REQ_LINE_2)
                 except ConnectionRefusedError:
                     print("ERROR! Cannot connect to the Server")
                     exit()
@@ -259,32 +266,30 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
                 chromosome_info = total_info['top_level_region']
 
-                # the for loop to know the length corresponding to the chromosome (also with the possibility that the
-                # chromosome that we have entered is not in the karyotype (in which case we return the Error.html file))
+                    # the for loop to know the length corresponding to the chromosome (also with the possibility that the
+                    # chromosome that we have entered is not in the karyotype (in which case we return the Error.html file))
                 for i in chromosome_info:
                     if i["coord_system"] == "chromosome" and i["name"] == chromo:
                         length = i["length"]
-                    else:
-                        length = None
 
-                # if everything is correct we put in html language the page we want to return
-                if length != None:
-                    contents = f"""
-                                <!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="utf-8">
-                                    <title>RESULT CHROMOSOME LENGTH</title>
-                                </head>
-                                <body style="background-color: lightblue;">
-                                    <p>The length of the chromosome is: {length}</p>
-                                </body>
-                                </html> 
-                                """
-                    status = 200
-                elif length == None:
-                    contents = Path("Error.html").read_text()
-                    status = 404
+                    # if everything is correct we put in html language the page we want to return
+                    if length != None:
+                        contents = f"""
+                                    <!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="utf-8">
+                                        <title>RESULT CHROMOSOME LENGTH</title>
+                                    </head>
+                                    <body style="background-color: lightblue;">
+                                        <p>The length of the chromosome is: {length}</p>
+                                    </body>
+                                    </html> 
+                                    """
+                        status = 200
+                    elif length == None:
+                        contents = Path("Error.html").read_text()
+                        status = 404
 
             # if the specie is not in the list (as in te previous option) we return the Error.html file
             elif specie not in species_list:
