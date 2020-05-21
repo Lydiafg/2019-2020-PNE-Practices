@@ -137,6 +137,9 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         elif verb == "/karyotype":
             pair = arguments[1]
             msg, specie = pair.split("=")
+
+            # we firstly connect to the previous API rest method to know if the specie is in the list of the ones in
+            # ensembl
             REQ_LINE_1 = ENDPOINT[0] + PARAMETERS
             conn = http.client.HTTPConnection(SERVER)
 
@@ -153,11 +156,13 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             species_info = total_info['species']
 
+            # we generate again the list of species and make options
             species_list = ""
             for i in range(len(species_info)):
                 species_list = species_list + "<li>"
                 species_list = species_list + species_info[i]['common_name']
 
+            # if is in the list then we connect to the second API rest endpoint to have the karyotype (by the same way)
             if specie in species_list:
                 REQ_LINE_2 = ENDPOINT[1] + specie + PARAMETERS
                 conn = http.client.HTTPConnection(SERVER)
@@ -186,21 +191,23 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                 <p>The names of the chromosomes are:</p>
                                 <ol>  
                             """
-
-                species_list = ""
+                # we make a list of all the names (or numbers) of the chromosomes in the karyotype
+                chromosomes_list = ""
                 for i in range(len(species_karyotype)):
-                    species_list = species_list + "<br>"
-                    species_list = species_list + species_karyotype[i]
-                species_list = species_list + "</ol></body></html>"
-                contents += f"<p>{species_list}</p>"
+                    chromosomes_list = chromosomes_list + "<br>"
+                    chromosomes_list = chromosomes_list + species_karyotype[i]
+                chromosomes_list = chromosomes_list + "</ol></body></html>"
+                contents += f"<p>{chromosomes_list}</p>"
                 contents += "</body></html>"
 
                 status = 200
 
+            # if the specie is not in the list of species of ensembl we return the Error.html file
             elif specie not in species_list:
                 contents = Path("Error.html").read_text()
-                status = 404
+                status = 400
 
+        # this option is called when the client wants to know the length of a chromosome of a specie in ensembl
         elif verb == "/chromosomeLength":
             pair = arguments[1]
             pairs = pair.split("&")
@@ -209,6 +216,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             msg, specie = pair_1.split("=")
             msg, chromo = pair_2.split("=")
 
+            # we firstly connect to the first API rest endpoint to know (as in the previous option) if the specie
+            # requested is in the list (we follow the same process)
             REQ_LINE_1 = ENDPOINT[0] + PARAMETERS
             conn = http.client.HTTPConnection(SERVER)
 
@@ -230,6 +239,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 species_list = species_list + "<li>"
                 species_list = species_list + species_info[i]['common_name']
 
+            # if the specie is in the list we connect to the corresponding API rest endpoint to know the length
             if specie in species_list:
                 length = None
 
@@ -249,12 +259,15 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
                 chromosome_info = total_info['top_level_region']
 
+                # the for loop to know the length corresponding to the chromosome (also with the possibility that the
+                # chromosome that we have entered is not in the karyotype (in which case we return the Error.html file))
                 for i in chromosome_info:
                     if i["coord_system"] == "chromosome" and i["name"] == chromo:
                         length = i["length"]
                     else:
                         length = None
 
+                # if everything is correct we put in html language the page we want to return
                 if length != None:
                     contents = f"""
                                 <!DOCTYPE html>
@@ -272,32 +285,43 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 elif length == None:
                     contents = Path("Error.html").read_text()
                     status = 404
+
+            # if the specie is not in the list (as in te previous option) we return the Error.html file
             elif specie not in species_list:
                 contents = Path("Error.html").read_text()
                 status = 404
+
+        # if the request line is not like one of the options above (as we do not have that info) we return the
+        # Error.html file
         else:
             contents = Path("Error.html").read_text()
             status = 404
 
+        # this is to generate the response message
         self.send_response(status)
 
+        # this is to convert all of the text written above as contents in html format
         self.send_header('Content-Type', 'text/html')
         self.send_header('Content-Length', len(str.encode(contents)))
 
         self.end_headers()
 
+        # this is to send the response message
         self.wfile.write(str.encode(contents))
 
         return
 
 
-
+# this is to set the new handler
 Handler = TestHandler
 
+# with this we open the socket server
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
 
+    # we print the port at which this server is
     print("Serving at PORT", PORT)
 
+    # this is the main loop (whenever a new client connects the handler is called)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
