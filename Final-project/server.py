@@ -274,8 +274,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
                     chromosome_info = total_info['top_level_region']
 
-                        # the for loop to know the length corresponding to the chromosome (also with the possibility that the
-                        # chromosome that we have entered is not in the karyotype (in which case we return the Error.html file))
+                    # the for loop to know the length corresponding to the chromosome (also with the possibility that the
+                    # chromosome that we have entered is not in the karyotype (in which case we return the Error.html file))
                     for i in chromosome_info:
                         if i["coord_system"] == "chromosome" and i["name"] == chromo:
                             length = i["length"]
@@ -304,8 +304,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     contents = Path("Error.html").read_text()
                     status = 404
 
+            # this option is called when the client wants to know the sequence of a human gene
             elif verb == "/geneSeq":
 
+                # we firstly connect to the third endpoint (xrefs/symbol/homo_sapiens/) so that we know the id of the gene
                 pair = arguments[1]
                 msg, gene = pair.split("=")
 
@@ -326,10 +328,9 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
                 gene_list = genes_id[0]
 
-                gene_id = gene_list['id']  # este es el id del gen que buscamos
+                gene_id = gene_list['id']  # this is the gene that we look for
 
-                # ahora nos conectamos al sequence/id para saber si coincide y da la secuencia
-
+                # now we connect to the fourth ednpoint (sequence/id) to know if both id are the same and then know it´s sequence
                 REQ_LINE_2 = ENDPOINT[3] + gene_id + PARAMETERS
                 conn = http.client.HTTPConnection(SERVER)
 
@@ -339,14 +340,13 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     print("ERROR! Cannot connect to the Server")
                     exit()
 
-                # we print the status of the request to know if it has worked and decode and read the data from the API rest
                 r1 = conn.getresponse()
                 print(f"Response received!: {r1.status} {r1.reason}\n")
                 data1 = r1.read().decode()
                 gene_info = json.loads(data1)
 
-                # different situations of the limit
-                # if we don´t write a limit
+                # different situations of the gene id
+                # if the gene ids are the same we print the sequence
                 if gene_id == gene_info['id']:
                     gene_seq = gene_info['seq']
                     gene_seq = Seq(gene_seq)
@@ -366,12 +366,17 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                                 </body>
                                                 </html>
                                             """
+
+                # if the gene ids are different we return an error
                 elif gene_id != gene_info['id']:
                     contents = Path("Error.html").read_text()
                     status = 404
 
-
+            # this option is called when the client wants to know some information about a human gene
             elif verb == "/geneInfo":
+
+                # we do the same as the previous one (we connect to the third endpoint to know the id of the gene and
+                # then to the fourth one and if the id are the same it will return the sequence)
                 pair = arguments[1]
                 msg, gene = pair.split("=")
 
@@ -393,26 +398,25 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
                 gene_list = genes_id[0]
 
-                gene_id = gene_list['id']
-                # ahora nos conectamos al sequence/id para saber si coincide y da la secuencia
+                gene_id = gene_list['id']  # this is the id we are looking for
 
+                # now we connect to the (sequence/id) fourth endpoint
                 REQ_LINE_2 = ENDPOINT[3] + gene_id + PARAMETERS
                 conn = http.client.HTTPConnection(SERVER)
 
                 try:
                     conn.request("GET", REQ_LINE_2)
-                except ConnectionRefusedError:  # this is for if the client cannot connect to the server (ensembl)
+                except ConnectionRefusedError:
                     print("ERROR! Cannot connect to the Server")
                     exit()
 
-                # we print the status of the request to know if it has worked and decode and read the data from the API rest
                 r1 = conn.getresponse()
                 print(f"Response received!: {r1.status} {r1.reason}\n")
                 data1 = r1.read().decode()
                 gene_info = json.loads(data1)
 
-                # different situations of the limit
-                # if we don´t write a limit
+                # different situations of the gene id
+                # if the gene ids are the same we print the information
                 if gene_id == gene_info['id']:
                     gene_seq = gene_info['seq']
                     gene_sequence = Seq(gene_seq)
@@ -434,11 +438,16 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                        </body>
                                        </html>
                                    """
+
+                # if the gene ids are different we return an error
                 elif gene_id != gene_info['id']:
                     contents = Path("Error.html").read_text()
                     status = 404
 
+            # this option is called when the client wants to do some calculations in a human gene
             elif verb == "/geneCalc":
+
+                # we do the same as in the two previous ones (so that we can know the sequence of the gene and do the calculations on it)
                 pair = arguments[1]
                 msg, gene = pair.split("=")
 
@@ -459,26 +468,24 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
                 gene_list = genes_id[0]
 
-                gene_id = gene_list['id']
-                # ahora nos conectamos al sequence/id para saber si coincide y da la secuencia
+                gene_id = gene_list['id']  # this is again the id we are looking for
 
+                # now we connect to the /sequence/id endpoint to know the sequence
                 REQ_LINE_2 = ENDPOINT[3] + gene_id + PARAMETERS
                 conn = http.client.HTTPConnection(SERVER)
 
                 try:
                     conn.request("GET", REQ_LINE_2)
-                except ConnectionRefusedError:  # this is for if the client cannot connect to the server (ensembl)
+                except ConnectionRefusedError:
                     print("ERROR! Cannot connect to the Server")
                     exit()
 
-                # we print the status of the request to know if it has worked and decode and read the data from the API rest
                 r1 = conn.getresponse()
                 print(f"Response received!: {r1.status} {r1.reason}\n")
                 data1 = r1.read().decode()
                 gene_info = json.loads(data1)
 
-                # different situations of the limit
-                # if we don´t write a limit
+                # the same different situations of the gene id
                 if gene_id == gene_info['id']:
                     gene_seq = gene_info['seq']
                     gene_sequence = Seq(gene_seq)
@@ -505,6 +512,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     contents = Path("Error.html").read_text()
                     status = 404
 
+            # this option is called when the client wants to know the list of genes in a specific region of a human chromosome
             elif verb == "/geneList":
                 pair = arguments[1]
                 pairs = pair.split("&")
@@ -512,6 +520,9 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 msg, start = pairs[1].split("=")
                 msg, end = pairs[2].split("=")
 
+                # in this case the parameters of the request line are different because we are searching for a gene
+                # also in the for loop for making the list of genes we do not have to put the region because with this
+                # endpoint the region is chosen first
                 REQ_LINE = ENDPOINT[4] + chromo + ":" + start + "-" + end + "?feature=gene;content-type=application/json"
                 conn = http.client.HTTPConnection(SERVER)
 
@@ -526,12 +537,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 print(f"Response received!: {r1.status} {r1.reason}\n")
                 data1 = r1.read().decode()
                 chromo_genes = json.loads(data1)
-                gene_list = "<ul>"
 
+                # the for loop to integrate the genes of the chromosome of that region
+                gene_list = "<ul>"
                 if len(chromo_genes) != 0:
                     for i in chromo_genes:
                         gene_list += "<p>" "<li>" + i["external_name"] + "</li>" + "</p>"
 
+                # if there are no genes in that region we invite the client to choose other region
                 else:
                     gene_list += "Sorry this region is not available. Choose another one!"
                     gene_list += "</ul></body></html>"
@@ -551,16 +564,19 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                    <p>The list of genes of the chromosome in that region is:</p>
                                """
 
+                # we add the list of genes to the html response
                 contents += f"<p>{gene_list}</p>"
                 contents += "</body></html>"
 
                 status = 200
+
             # if the request line is not like one of the options above (as we do not have that info) we return the
             # Error.html file
             else:
                 contents = Path("Error.html").read_text()
                 status = 404
 
+        # we return an error when any of this errors come up (like if you enter a chromosome out of range for example)
         except (ValueError, KeyError, IndexError, TypeError):
             contents = Path("Error.html").read_text()
             status = 404
