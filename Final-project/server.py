@@ -514,6 +514,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             # this option is called when the client wants to know the list of genes in a specific region of a human chromosome
             elif verb == "/geneList":
+
                 pair = arguments[1]
                 pairs = pair.split("&")
                 msg, chromo = pairs[0].split("=")
