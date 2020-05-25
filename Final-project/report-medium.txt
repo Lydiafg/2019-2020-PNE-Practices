@@ -1,5 +1,100 @@
-REPORT FOR BASIC AND MEDIUM LEVEL
+REPORT FOR BASIC AND MEDIUM LEVEL - LYDIA FERNÁNDEZ GONZÁLEZ
 -----------------------------------
+
+---> main endpoint:
+
+    *TEST 1:
+        - Input:
+        http://127.0.0.1:8080/
+
+        -Output:
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Main page</title>
+          </head>
+          <body style="background-color: lightyellow;">
+            <h1>Browsing Human and Vertebrates genome</h1>
+            <h2>BASIC Level Services</h2>
+            <form action="listSpecies" method="get">
+              1) List of species in the genome database
+                <br><br>
+                Limit : <input type="text" name="msg">
+                <br><br>
+            <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+            </form>
+            </form>
+          <form action="karyotype" method="get">
+              2) Information about the karyotype :
+                <br><br>
+                Select the species : <input type="text" name="msg">
+                <br><br>
+            <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+            </form>
+            </form>
+          <form action="chromosomeLength" method="get">
+              3) Chromosome Length :
+                <br><br>
+                Select the species : <input type="text" name="msg">
+                <br><br>
+                Select a chromosome : <input type="text" name="msg">
+                <br><br>
+              <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+                </form>
+              </form>
+          <form action="geneSeq" method="get">
+              4) Sequence of a human gene:
+              <br><br>
+              Select the human gene: <input type="text" name="msg">
+              <br><br>
+              <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+                </form>
+          </form>
+          <form action="geneInfo" method="get">
+              5) Information of a human gene:
+              <br><br>
+              Select the human gene: <input type="text" name="msg">
+              <br><br>
+              <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+                </form>
+          </form>
+          <form action="geneCalc" method="get">
+              6) Calculations on a human gene (total length and percentage of bases):
+              <br><br>
+              Select the human gene: <input type="text" name="msg">
+              <br><br>
+              <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+                </form>
+          </form>
+          <form action="geneList" method="get">
+              7) Name of the genes in a human chromosome:
+              <br><br>
+              Select the human chromosome: <input type="text" name="msg">
+              <br><br>
+              Select the start point: <input type="text" name="msg">
+              <br><br>
+              Select the end point: <input type="text" name="msg">
+              <br><br>
+              <form action="get" method="get">
+               <input type="submit" value="Send">
+                <br><br>
+                </form>
+          </form>
+          </body>
+        </html>
 
 ---> listSpecies endpoint:
     * TEST 1 (if you put a limit (number in the range)):
